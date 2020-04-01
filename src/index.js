@@ -1,9 +1,11 @@
-const express = require("express");
+const express = require('express');
+const routes = require('./routes');
+const cors = require('cors');
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
-
-console.log(process.env.DEVELOPMENT_DATABASE_USER)
+app.use(routes);
 
 app.listen(8000);

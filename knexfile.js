@@ -1,7 +1,6 @@
-require('dotenv').config({path: './.env'});
+require('dotenv').config({ path: './.env' });
 
 // Update with your config settings.
-
 module.exports = {
 	development: {
 		client: 'postgresql',
@@ -16,7 +15,8 @@ module.exports = {
 		},
 		migrations: {
 			directory: './src/database/migrations'
-		}
+		},
+		useNullAsDefault: true
 	},
 
 	staging: {
