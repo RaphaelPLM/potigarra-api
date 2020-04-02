@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 module.exports = {
 	verifyToken(request, response, next) {
-		const bearerHeader = request.headers['x-access-token'] || request.headers['authorization'];;
+		const bearerHeader = request.headers['x-access-token'] || request.headers['authorization'];
 
 		if (typeof bearerHeader !== 'undefined') {
 			const bearer = bearerHeader.split(' ');
