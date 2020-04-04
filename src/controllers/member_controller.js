@@ -25,6 +25,8 @@ module.exports = {
 	async create(request, response) {
 		const { username, email, password, cpf, rg, classNumber, gender, phoneNumber, birthdate } = request.body;
 
+		console.log('Request body: ', request.body);
+
 		const passwordHash = bcrypt.hashSync(password, 10);
 
 		const data = await connection('members').insert({
@@ -38,7 +40,5 @@ module.exports = {
 			phone_number: phoneNumber,
 			birthdate: birthdate
 		});
-
-		console.log(data);
 	}
 };
