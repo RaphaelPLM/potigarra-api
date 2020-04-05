@@ -14,16 +14,18 @@ async function getUserFromEmail(email) {
 
 module.exports = {
 	async login(request, response) {
-		console.log('Started [GET] /login');
+		console.log('Started [POST] /login');
 
 		const { email, password } = request.body;
+
+		console.log('Received JSON params: ', request.body);
 
 		const passwordHash = await getUserFromEmail(email);
 
 		if (!bcrypt.compareSync(password, passwordHash)) {
 			const errorMessage = 'The authentication failed. The credentials provided are invalid.';
 
-			console.log('[ERROR] ' + errorMessage);
+			console.log('[ERROR] ', errorMessage);
 
 			return response.status(401).json({ error: errorMessage });
 		}

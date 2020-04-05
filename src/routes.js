@@ -10,6 +10,6 @@ const routes = express.Router();
 routes.get('/members', AuthMiddleware.verifyToken, MembersController.index);
 routes.post('/register', MembersController.create);
 
-routes.get('/login', AuthController.login);
+routes.post('/login', AuthController.login);
 
 module.exports = routes;
