@@ -12,4 +12,8 @@ routes.post('/register', MembersController.create);
 
 routes.post('/login', AuthController.login);
 
+routes.get('/verifyToken', AuthMiddleware.verifyToken, (request, response) => {
+	return response.status(200).json({ message: 'The token is valid.' });
+});
+
 module.exports = routes;
