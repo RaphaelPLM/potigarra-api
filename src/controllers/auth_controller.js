@@ -9,6 +9,11 @@ async function getUserFromEmail(email) {
 
 	const data = await connection('members').select('password').where('email', email).first();
 
+	// In case the user is invalid, data will be undefined.
+	if(data == undefined) {
+		return undefined;
+	}
+
 	return data.password;
 }
 
@@ -16,15 +21,22 @@ module.exports = {
 	async login(request, response) {
 		console.log('Started [POST] /login');
 
+		const errorMessage = 'The authentication failed. The credentials provided are invalid.';
+
 		const { email, password } = request.body;
 
 		console.log('Received JSON params: ', request.body);
 
 		const passwordHash = await getUserFromEmail(email);
 
-		if (!bcrypt.compareSync(password, passwordHash)) {
-			const errorMessage = 'The authentication failed. The credentials provided are invalid.';
+		if(passwordHash == undefined)
+		{
+			console.log('[ERROR] ', errorMessage);
 
+			return response.status(401).json({ error: errorMessage})
+		}
+
+		if (!bcrypt.compareSync(password, passwordHash)) {
 			console.log('[ERROR] ', errorMessage);
 
 			return response.status(401).json({ error: errorMessage });
