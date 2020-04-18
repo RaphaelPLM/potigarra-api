@@ -23,24 +23,6 @@ module.exports = {
       member_id: userId
     })
 
-    return response.status(200).json({data});
-    
-    // const { username, email, password, cpf, rg, classNumber, gender, phoneNumber, birthdate } = request.body;
-
-		// const passwordHash = bcrypt.hashSync(password, 10);
-
-		// const data = await connection('members').insert({
-		// 	username: username,
-		// 	email: email,
-		// 	password: passwordHash,
-		// 	cpf: cpf,
-		// 	rg: rg,
-		// 	class_number: classNumber,
-		// 	gender: gender,
-		// 	phone_number: phoneNumber,
-		// 	birthdate: birthdate
-		// });
-
-		// return response.status(200).json();
+    return response.status(200).json();
 	}
 };
