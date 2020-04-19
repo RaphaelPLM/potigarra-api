@@ -6,12 +6,14 @@ const CardsController = require('./controllers/card_controller');
 
 const AuthMiddleware = require('./middlewares/auth_middleware');
 
+const MemberValidator = require('./validators/member_validator');
+
 const routes = express.Router();
 
 
 // Member routes
 routes.get('/members', AuthMiddleware.verifyToken, MembersController.index);
-routes.post('/register', MembersController.create);
+routes.post('/register', MemberValidator.validateCreate, MembersController.create);
 
 // Auth routes
 routes.post('/login', AuthController.login);
