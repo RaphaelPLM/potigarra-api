@@ -21,6 +21,5 @@ routes.get('/verifyToken', AuthMiddleware.verifyToken, (request, response) => {
 
 //Card routes
 routes.get('/cards', AuthMiddleware.verifyToken, CardsController.index);
-routes.post('/cards/new', AuthMiddleware.verifyToken, CardsController.create);
 
 module.exports = routes;

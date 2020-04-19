@@ -2,7 +2,7 @@ exports.up = function(knex) {
 	return knex.schema.createTable('members', function(table) {
 		table.increments();
 
-		table.string('username').unique().notNullable();
+		table.string('username').notNullable();
 		table.string('email').unique().notNullable();
 		table.string('password').notNullable();
 		table.string('cpf').unique().notNullable();
@@ -10,7 +10,6 @@ exports.up = function(knex) {
 		table.string('class_number').notNullable();
 		table.string('gender').notNullable();
 		table.string('phone_number').notNullable();
-
 		table.date('birthdate').notNullable();
 
 		table.timestamp('created_at').notNullable().defaultTo(knex.raw('now()'));
