@@ -1,58 +1,67 @@
-require('dotenv').config({ path: './.env' });
+require("dotenv").config({ path: "./.env" });
 
-const connection = require('../database/connection');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const connection = require("../database/connection");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 async function getUserFromEmail(email) {
-	console.log('Authenticating...');
+  console.log("Authenticating...");
 
-	const data = await connection('members').select('password').where('email', email).first();
+  const data = await connection("members")
+    .select("id", "password")
+    .where("email", email)
+    .first();
 
-	// In case the user is invalid, data will be undefined.
-	if(data == undefined) {
-		return undefined;
-	}
+  // In case the user is invalid, data will be undefined.
+  if (data == undefined) {
+    return undefined;
+  }
 
-	return data.password;
+  return { id: data.id, password: data.password };
 }
 
 module.exports = {
-	async login(request, response) {
-		console.log('Started [POST] /login');
+  async login(request, response) {
+    console.log("Started [POST] /login");
 
-		const errorMessage = 'The authentication failed. The credentials provided are invalid.';
+    const errorMessage =
+      "The authentication failed. The credentials provided are invalid.";
 
-		const { email, password } = request.body;
+    const { email, password } = request.body;
 
-		console.log('Received JSON params: ', request.body);
+    console.log("Received JSON params:", request.body);
 
-		const passwordHash = await getUserFromEmail(email);
+    const user = await getUserFromEmail(email);
 
-		if(passwordHash == undefined)
-		{
-			console.log('[ERROR] ', errorMessage);
+    if (user == undefined) {
+      console.log("[ERROR]", errorMessage);
 
-			return response.status(401).json({ error: errorMessage})
-		}
+      return response.status(401).json({ error: errorMessage });
+    }
 
-		if (!bcrypt.compareSync(password, passwordHash)) {
-			console.log('[ERROR] ', errorMessage);
+    const userId = user.id;
+    const passwordHash = user.password;
 
-			return response.status(401).json({ error: errorMessage });
-		}
+    if (!bcrypt.compareSync(password, passwordHash)) {
+      console.log("[ERROR]", errorMessage);
 
-		jwt.sign(
-			{ user: email },
-			process.env.TOKEN_SECRET_KEY,
-			{ expiresIn: parseInt(process.env.TOKEN_EXPIRATION_TIME) },
-			(error, token) => {
-				const successMessage = 'The credentials provided are valid. Succesfully logged in.';
+      return response.status(401).json({ error: errorMessage });
+    }
 
-				console.log('[SUCCESS] ' + successMessage);
+    jwt.sign(
+      { user: { id: userId, email } },
+      process.env.TOKEN_SECRET_KEY,
+      { expiresIn: parseInt(process.env.TOKEN_EXPIRATION_TIME) },
+      (error, token) => {
+        const successMessage =
+          "The credentials provided are valid. Succesfully logged in.";
 
-				return response.status(200).json({ token: token, message: successMessage });
-			}
-		);
-	}
+        console.log("[SUCCESS]", successMessage);
+
+        return response
+          .status(200)
+          .json({ token: token, message: successMessage });
+      }
+    );
+  },
 };
