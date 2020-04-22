@@ -1,11 +1,6 @@
 const connection = require("../database/connection");
 const axios = require("axios");
-
-function formatDate(unformattedDate) {
-  const date = new Date(unformattedDate);
-
-  return date.toLocaleDateString("en-GB");
-}
+var format = require('date-fns/format')
 
 module.exports = {
   async index(request, response) {
@@ -48,8 +43,10 @@ module.exports = {
       .first();
 
     const name = memberData.username;
-    const createdAt = formatDate(memberData.created_at);
+    const createdAt = format(memberData.created_at, 'dd/MM/yyyy');
     const expirationDate = "01/01/2021";
+
+    console.log({name, createdAt, expirationDate})
 
     const apiURL = process.env.PASSSLOT_URL;
 
