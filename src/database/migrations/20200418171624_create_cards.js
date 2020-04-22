@@ -4,6 +4,7 @@ exports.up = function (knex) {
 
     table.string("url").unique();
     table.string("status").notNullable().defaultTo("Pending");
+    table.string("serial_number").unique();
     table.integer("member_id").unique().notNullable();
     table.timestamp("created_at").notNullable().defaultTo(knex.raw("now()"));
 

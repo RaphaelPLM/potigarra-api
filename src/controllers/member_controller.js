@@ -22,7 +22,6 @@ module.exports = {
 
     return response.json(members);
   },
-
   async create(request, response) {
     const {
       username,
