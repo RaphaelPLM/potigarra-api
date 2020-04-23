@@ -1,13 +1,13 @@
 const connection = require("../database/connection");
 const axios = require("axios");
-var format = require('date-fns/format')
+var format = require("date-fns/format");
 
 module.exports = {
   async index(request, response) {
     const cards = await connection("cards")
       .join("members", "members.id", "=", "cards.member_id")
       .select(
-        "*",
+        "cards.*",
         "members.username",
         "members.cpf",
         "members.rg",
@@ -26,15 +26,21 @@ module.exports = {
   },
 
   async create(id) {
-    const data = await connection("cards").insert({
-      member_id: id,
-    });
+    try {
+      const data = await connection("cards").insert({
+        member_id: id,
+      });
 
-    console.log("Created card for member", id);
+      console.log("Created card for member", id, "\n", data, "\n");
+    } catch (err) {
+      console.log("An error occurred when creating a card for member", id);
+    }
   },
 
   async generatePass(request, response) {
     const { memberId } = request.body;
+
+    console.log("Generating pass for member of ID", memberId);
 
     // Get data of the member whose card will be activated
     const memberData = await connection("members")
@@ -43,10 +49,10 @@ module.exports = {
       .first();
 
     const name = memberData.username;
-    const createdAt = format(memberData.created_at, 'dd/MM/yyyy');
+    const createdAt = format(memberData.created_at, "dd/MM/yyyy");
     const expirationDate = "01/01/2021";
 
-    console.log({name, createdAt, expirationDate})
+    console.log({ name, createdAt, expirationDate });
 
     const apiURL = process.env.PASSSLOT_URL;
 
@@ -56,6 +62,8 @@ module.exports = {
       },
     };
 
+    var updatedCard = [];
+
     try {
       const apiResponse = await axios.post(
         apiURL,
@@ -63,11 +71,24 @@ module.exports = {
         config
       );
 
+      console.log(
+        "Pass successfully generated.\n",
+        apiResponse,
+        "\nStoring pass data in database..."
+      );
+
       await connection("cards").where("member_id", memberId).update({
         url: apiResponse.data.url,
         status: "Active",
-        serial_number: apiResponse.data.serialNumber
+        serial_number: apiResponse.data.serialNumber,
       });
+
+      updatedCard = await connection("cards")
+        .select("*")
+        .where({ member_id: memberId })
+        .first();
+
+      console.log("Successfully stored pass data in database\n", updatedCard);
     } catch (err) {
       console.log(
         "An error has occurred while generating pass for member",
@@ -79,6 +100,9 @@ module.exports = {
         .json({ error: "An error has occured. Try again." });
     }
 
-    return response.status(200).json({message: "Your card was successfully generated."})
+    return response.status(200).json({
+      card: updatedCard,
+      message: "Your card was successfully generated.",
+    });
   },
 };
