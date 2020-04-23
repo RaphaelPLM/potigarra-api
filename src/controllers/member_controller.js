@@ -58,6 +58,8 @@ module.exports = {
           .status(422)
           .json({ error: "This email is already in use." });
       } else {
+        console.log(err)
+        
         return response
           .status(422)
           .json({ error: "An error occurred while registering. Try again." });
